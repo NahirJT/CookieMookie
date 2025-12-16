@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://c45i6s5vofwjy"]
+
+[ext_resource type="Script" uid="uid://by7yenge5jyco" path="res://block.gd" id="1_im0tn"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_qncar"]
+radius = 0.745
+height = 0.5
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_im0tn"]
+
+[node name="Block" type="Node3D"]
+script = ExtResource("1_im0tn")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
+mesh = SubResource("SphereMesh_qncar")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+unique_name_in_owner = true
+shape = SubResource("SphereShape3D_im0tn")
