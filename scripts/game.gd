@@ -16,3 +16,13 @@ extends Node3D
 @onready var moving_holder: Node3D = $MovingBlock
 @onready var hud: Node = $CanvasLayer/HUD
 @onready var game_camera: Camera3D = $Camera3D
+
+
+var level: int = 0
+var score: int = 0
+var direction := "x"
+var current_block: Node3D = null
+var last_block: Node3D = null
+var game_over: bool = false
+var move_time: float = 0.0
+var camera_target_y: float = 6.0
