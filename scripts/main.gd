@@ -1,27 +1,33 @@
 extends Node3D
 
-@export var start_cookie_width: float = 2.0
-@export var start_cookie_depth: float = 2.0
+const PERFECT_SCALE_FACTOR: float = 1.06
+const PERFECT_SCALE_DURATION: float = 0.08
+const CAMERA_MOVE_DURATION: float = 0.15
+const FALLING_DISTANCE: float = 10.0
+const FALLING_DURATION: float = 1.0
+const SIZE_EPSILON: float = 0.001
+
+@export var initial_width: float = 2.0
+@export var initial_depth: float = 2.0
 @export var cookie_height: float = 0.3
 @export var movement_range: float = 4.0
-@export var movement_speed_base: float = 4.0
+@export var base_movement_speed: float = 4.0
 @export var speed_increase_per_level: float = 0.03
 @export var perfect_threshold: float = 0.06
-@export var minimum_overlap_to_continue: float = 0.01
+@export var minimum_overlap: float = 0.01
 
 @onready var _cookie_scene: PackedScene = preload("uid://ypbcdx745n4b")
 @onready var _camera: Camera3D = $Camera3D
-@onready var _ui: Control = $CanvasLayer/UI
-@onready var _stack_root: Node3D = $StackRoot
-@onready var _moving_cookie_root: Node3D = $MovingCookie
+@onready var _stack: Node3D = $Stack
+@onready var _active_cookie_holder: Node3D = $ActiveCookie
 
 var score: int = 0
-var game_over: bool = false
+var is_game_over: bool = false
 
-var _height_level: int = 0
+var _stack_count: int = 0
 var _movement_axis := "x"
-var _current_cookie: Node3D = null
-var _last_cookie: Node3D = null
+var _active_cookie: Node3D = null
+var _top_cookie: Node3D = null
 var _movement_time: float = 0.0
 
 
@@ -31,15 +37,15 @@ func _ready() -> void:
 
 
 func _start_game() -> void:
-	_clear_children(_stack_root)
-	_clear_children(_moving_cookie_root)
+	_clear_children(_stack)
+	_clear_children(_active_cookie_holder)
 
-	_height_level = 0
+	_stack_count = 0
 	score = 0
 	_movement_axis = "x"
-	_current_cookie = null
-	_last_cookie = null
-	game_over = false
+	_active_cookie = null
+	_top_cookie = null
+	is_game_over = false
 	_movement_time = 0.0
 
 	_spawn_base_cookie()
@@ -49,59 +55,59 @@ func _spawn_base_cookie() -> void:
 	var base_cookie = _cookie_scene.instantiate() as Node3D
 	base_cookie.name = "BaseCookie"
 	base_cookie.position = Vector3.ZERO
-	base_cookie.set("width", start_cookie_width)
-	base_cookie.set("depth", start_cookie_depth)
+	base_cookie.set("width", initial_width)
+	base_cookie.set("depth", initial_depth)
 	base_cookie.set("height", cookie_height)
 	base_cookie.call_deferred("update_mesh")
-	_stack_root.add_child(base_cookie)
-	_last_cookie = base_cookie
+	_stack.add_child(base_cookie)
+	_top_cookie = base_cookie
 
 	_spawn_moving_cookie()
 
 
 func _spawn_moving_cookie() -> void:
-	if game_over:
+	if is_game_over:
 		return
 
-	_current_cookie = _cookie_scene.instantiate() as Node3D
-	_current_cookie.name = "Cookie_%d" % _height_level
+	_active_cookie = _cookie_scene.instantiate() as Node3D
+	_active_cookie.name = "Cookie_%d" % _stack_count
 
-	var last_width = _last_cookie.get("width")
-	var last_depth = _last_cookie.get("depth")
-	_current_cookie.set("width", last_width)
-	_current_cookie.set("depth", last_depth)
-	_current_cookie.set("height", cookie_height)
-	_current_cookie.set("movement_axis", _movement_axis)
-	_current_cookie.call_deferred("update_mesh")
+	var top_width = _top_cookie.get("width")
+	var top_depth = _top_cookie.get("depth")
+	_active_cookie.set("width", top_width)
+	_active_cookie.set("depth", top_depth)
+	_active_cookie.set("height", cookie_height)
+	_active_cookie.set("movement_axis", _movement_axis)
+	_active_cookie.call_deferred("update_mesh")
 
-	_moving_cookie_root.add_child(_current_cookie)
+	_active_cookie_holder.add_child(_active_cookie)
 
-	var last_position = _last_cookie.global_transform.origin
-	var spawn_position = Vector3(last_position.x, last_position.y + cookie_height, last_position.z)
-	_current_cookie.global_transform = Transform3D(Basis.IDENTITY, spawn_position)
+	var top_position = _top_cookie.global_transform.origin
+	var spawn_position = Vector3(top_position.x, top_position.y + cookie_height, top_position.z)
+	_active_cookie.global_transform = Transform3D(Basis.IDENTITY, spawn_position)
 
-	_height_level += 1
+	_stack_count += 1
 
 
-func _move_current_cookie(_delta: float) -> void:
-	if not _current_cookie or not _last_cookie:
+func _move_active_cookie() -> void:
+	if not _active_cookie or not _top_cookie:
 		return
 
-	var speed = movement_speed_base + _height_level * speed_increase_per_level
+	var speed = base_movement_speed + _stack_count * speed_increase_per_level
 	var offset = movement_range * sin(_movement_time * speed)
 
-	var last_position = _last_cookie.global_transform.origin
-	var new_position = _current_cookie.global_transform.origin
+	var top_position = _top_cookie.global_transform.origin
+	var new_position = _active_cookie.global_transform.origin
 
-	if _current_cookie.get("movement_axis") == "x":
-		new_position.x = last_position.x + offset
-		new_position.z = last_position.z
+	if _active_cookie.get("movement_axis") == "x":
+		new_position.x = top_position.x + offset
+		new_position.z = top_position.z
 	else:
-		new_position.x = last_position.x
-		new_position.z = last_position.z + offset
+		new_position.x = top_position.x
+		new_position.z = top_position.z + offset
 
-	new_position.y = last_position.y + cookie_height
-	_current_cookie.global_transform = Transform3D(_current_cookie.global_transform.basis, new_position)
+	new_position.y = top_position.y + cookie_height
+	_active_cookie.global_transform = Transform3D(_active_cookie.global_transform.basis, new_position)
 
 
 func _clear_children(node: Node) -> void:
@@ -110,65 +116,70 @@ func _clear_children(node: Node) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if game_over:
+	if is_game_over:
 		return
 
 	_movement_time += delta
-	_move_current_cookie(delta)
+	_move_active_cookie()
 
-	if Input.is_action_just_pressed("drop"):
-		_drop_cookie()
+	if Input.is_action_just_pressed("place"):
+		_place_cookie()
 
 
-func _drop_cookie() -> void:
-	if not _current_cookie or game_over:
+func _place_cookie() -> void:
+	if not _active_cookie or is_game_over:
 		return
 
-	var saved_transform = _current_cookie.global_transform
-	if _current_cookie.get_parent() == _moving_cookie_root:
-		_moving_cookie_root.remove_child(_current_cookie)
+	var saved_transform = _active_cookie.global_transform
+	if _active_cookie.get_parent() == _active_cookie_holder:
+		_active_cookie_holder.remove_child(_active_cookie)
 
-	_stack_root.add_child(_current_cookie)
-	_current_cookie.global_transform = saved_transform
+	_stack.add_child(_active_cookie)
+	_active_cookie.global_transform = saved_transform
 
-	var info = _slice_with_last(_current_cookie, _last_cookie)
-	if info.get("game_over", false):
+	var result = _calculate_slice(_active_cookie, _top_cookie)
+	if result.get("is_game_over", false):
 		_on_game_over()
 		return
 
-	if info.get("perfect", false):
-		_current_cookie.set("width", _last_cookie.get("width"))
-		_current_cookie.set("depth", _last_cookie.get("depth"))
-		_current_cookie.call_deferred("update_mesh")
-
-		var tween = create_tween()
-		tween.tween_property(_current_cookie, "scale", Vector3(1.06, 1.06, 1.06), 0.08) \
-			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		tween.tween_property(_current_cookie, "scale", Vector3.ONE, 0.08) \
-			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	if result.get("is_perfect", false):
+		_active_cookie.set("width", _top_cookie.get("width"))
+		_active_cookie.set("depth", _top_cookie.get("depth"))
+		_active_cookie.call_deferred("update_mesh")
+		_play_perfect_animation(_active_cookie)
 	else:
-		_current_cookie.set("width", info.get("remain_width"))
-		_current_cookie.set("depth", info.get("remain_depth"))
-		_current_cookie.call_deferred("update_mesh")
+		_active_cookie.set("width", result.get("remain_width"))
+		_active_cookie.set("depth", result.get("remain_depth"))
+		_active_cookie.call_deferred("update_mesh")
 
-		var falling_size: Vector3 = info.get("falling_size")
-		if falling_size.x > 0.001 or falling_size.z > 0.001:
-			_spawn_falling_piece(falling_size, info.get("falling_world_center"), info.get("axis"))
+		var falling_size: Vector3 = result.get("falling_size")
+		if falling_size.x > SIZE_EPSILON or falling_size.z > SIZE_EPSILON:
+			_spawn_falling_piece(falling_size, result.get("falling_center"))
 
-	_last_cookie = _current_cookie
+	_top_cookie = _active_cookie
 	score += 1
 
-	# Bump camera up.
-	var camera_tween = create_tween()
-	var new_camera_pos = _camera.global_transform.origin + Vector3(0, cookie_height, 0)
-	camera_tween.tween_property(_camera, "global_transform:origin", new_camera_pos, 0.15) \
-		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-
+	_move_camera_up()
 	_movement_axis = "z" if _movement_axis == "x" else "x"
 	_spawn_moving_cookie()
 
 
-func _slice_with_last(current: Node3D, previous: Node3D) -> Dictionary:
+func _play_perfect_animation(cookie: Node3D) -> void:
+	var tween = create_tween()
+	tween.tween_property(cookie, "scale", Vector3.ONE * PERFECT_SCALE_FACTOR, PERFECT_SCALE_DURATION) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(cookie, "scale", Vector3.ONE, PERFECT_SCALE_DURATION) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+
+
+func _move_camera_up() -> void:
+	var tween = create_tween()
+	var new_position = _camera.global_transform.origin + Vector3(0, cookie_height, 0)
+	tween.tween_property(_camera, "global_transform:origin", new_position, CAMERA_MOVE_DURATION) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+
+func _calculate_slice(current: Node3D, previous: Node3D) -> Dictionary:
 	var axis = current.get("movement_axis")
 	var current_pos = current.global_transform.origin
 	var previous_pos = previous.global_transform.origin
@@ -181,7 +192,7 @@ func _slice_with_last(current: Node3D, previous: Node3D) -> Dictionary:
 	var remain_width = current_width
 	var remain_depth = current_depth
 	var falling_size = Vector3.ZERO
-	var falling_world_center = Vector3.ZERO
+	var falling_center = Vector3.ZERO
 
 	if axis == "x":
 		var diff = current_pos.x - previous_pos.x
@@ -189,85 +200,80 @@ func _slice_with_last(current: Node3D, previous: Node3D) -> Dictionary:
 
 		# Check for perfect placement.
 		if abs(diff) <= perfect_threshold:
-			return {
-				"game_over": false,
-				"remain_width": previous_width,
-				"remain_depth": previous_depth,
-				"axis": axis,
-				"falling_size": Vector3.ZERO,
-				"falling_world_center": Vector3.ZERO,
-				"perfect": true
-			}
+			return _make_perfect_result(previous_width, previous_depth, axis)
 
 		# Check for game over.
-		if overlap <= minimum_overlap_to_continue:
-			return {"game_over": true}
+		if overlap <= minimum_overlap:
+			return {"is_game_over": true}
 
 		remain_width = overlap
 
 		# Reposition the current cookie to be centered on the overlap.
 		var new_center_x = previous_pos.x + diff * 0.5
-		var new_local = _stack_root.to_local(Vector3(new_center_x, current_pos.y, current_pos.z))
-		var pos = current.position
-		pos.x = new_local.x
-		current.position = pos
+		var local_pos = _stack.to_local(Vector3(new_center_x, current_pos.y, current_pos.z))
+		var cookie_pos = current.position
+		cookie_pos.x = local_pos.x
+		current.position = cookie_pos
 
 		# Calculate falling piece.
-		var falling_piece_width = current_width - remain_width
-		if falling_piece_width > 0.001:
-			falling_size = Vector3(falling_piece_width, cookie_height, current_depth)
+		var falling_width = current_width - remain_width
+		if falling_width > SIZE_EPSILON:
+			falling_size = Vector3(falling_width, cookie_height, current_depth)
 			var direction_sign = 1.0 if diff >= 0.0 else -1.0
-			var falling_center_x = new_center_x + direction_sign * (remain_width * 0.5 + falling_piece_width * 0.5)
-			falling_world_center = Vector3(falling_center_x, current_pos.y, current_pos.z)
+			var falling_x = new_center_x + direction_sign * (remain_width * 0.5 + falling_width * 0.5)
+			falling_center = Vector3(falling_x, current_pos.y, current_pos.z)
 	else:
 		var diff = current_pos.z - previous_pos.z
 		var overlap = previous_depth - abs(diff)
 
 		# Check for perfect placement.
 		if abs(diff) <= perfect_threshold:
-			return {
-				"game_over": false,
-				"remain_width": previous_width,
-				"remain_depth": previous_depth,
-				"axis": axis,
-				"falling_size": Vector3.ZERO,
-				"falling_world_center": Vector3.ZERO,
-				"perfect": true
-			}
+			return _make_perfect_result(previous_width, previous_depth, axis)
 
 		# Check for game over.
-		if overlap <= minimum_overlap_to_continue:
-			return {"game_over": true}
+		if overlap <= minimum_overlap:
+			return {"is_game_over": true}
 
 		remain_depth = overlap
 
 		# Reposition the current cookie to be centered on the overlap.
 		var new_center_z = previous_pos.z + diff * 0.5
-		var new_local = _stack_root.to_local(Vector3(current_pos.x, current_pos.y, new_center_z))
-		var pos = current.position
-		pos.z = new_local.z
-		current.position = pos
+		var local_pos = _stack.to_local(Vector3(current_pos.x, current_pos.y, new_center_z))
+		var cookie_pos = current.position
+		cookie_pos.z = local_pos.z
+		current.position = cookie_pos
 
 		# Calculate falling piece.
-		var falling_piece_depth = current_depth - remain_depth
-		if falling_piece_depth > 0.001:
-			falling_size = Vector3(current_width, cookie_height, falling_piece_depth)
+		var falling_depth = current_depth - remain_depth
+		if falling_depth > SIZE_EPSILON:
+			falling_size = Vector3(current_width, cookie_height, falling_depth)
 			var direction_sign = 1.0 if diff >= 0.0 else -1.0
-			var falling_center_z = new_center_z + direction_sign * (remain_depth * 0.5 + falling_piece_depth * 0.5)
-			falling_world_center = Vector3(current_pos.x, current_pos.y, falling_center_z)
+			var falling_z = new_center_z + direction_sign * (remain_depth * 0.5 + falling_depth * 0.5)
+			falling_center = Vector3(current_pos.x, current_pos.y, falling_z)
 
 	return {
-		"game_over": false,
+		"is_game_over": false,
+		"is_perfect": false,
 		"remain_width": remain_width,
 		"remain_depth": remain_depth,
 		"axis": axis,
 		"falling_size": falling_size,
-		"falling_world_center": falling_world_center,
-		"perfect": false
+		"falling_center": falling_center
+	}
+
+func _make_perfect_result(width: float, depth: float, axis: String) -> Dictionary:
+	return {
+		"is_game_over": false,
+		"is_perfect": true,
+		"remain_width": width,
+		"remain_depth": depth,
+		"axis": axis,
+		"falling_size": Vector3.ZERO,
+		"falling_center": Vector3.ZERO
 	}
 
 
-func _spawn_falling_piece(size: Vector3, world_center: Vector3, _axis: String) -> void:
+func _spawn_falling_piece(size: Vector3, world_center: Vector3) -> void:
 	var falling_piece = _cookie_scene.instantiate() as Node3D
 	falling_piece.name = "FallingPiece"
 	falling_piece.set("width", size.x)
@@ -281,16 +287,16 @@ func _spawn_falling_piece(size: Vector3, world_center: Vector3, _axis: String) -
 	var tween = create_tween()
 	tween.set_parallel(true)
 
-	var fall_target = world_center + Vector3(0, -10, 0)
-	tween.tween_property(falling_piece, "global_transform:origin", fall_target, 1.0) \
+	var fall_target = world_center + Vector3(0, -FALLING_DISTANCE, 0)
+	tween.tween_property(falling_piece, "global_transform:origin", fall_target, FALLING_DURATION) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 
 	var random_rotation = Vector3(randf_range(-2, 2), randf_range(-1, 1), randf_range(-2, 2))
-	tween.tween_property(falling_piece, "rotation", random_rotation, 1.0)
+	tween.tween_property(falling_piece, "rotation", random_rotation, FALLING_DURATION)
 
 	tween.chain().tween_callback(falling_piece.queue_free)
 
 
 func _on_game_over() -> void:
-	game_over = true
+	is_game_over = true
 	print("Game Over! Score: %d" % score)

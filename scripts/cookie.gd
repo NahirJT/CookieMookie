@@ -6,8 +6,8 @@ extends Node3D
 
 var movement_axis: String = "x"
 
-@onready var _mesh_instance: MeshInstance3D = %MeshInstance3D
-@onready var _collision_shape: CollisionShape3D = %CollisionShape3D
+@onready var _mesh: MeshInstance3D = %MeshInstance3D
+@onready var _collider: CollisionShape3D = %CollisionShape3D
 
 
 func _ready():
@@ -15,15 +15,15 @@ func _ready():
 
 
 func update_mesh():
-	var mesh = BoxMesh.new()
-	mesh.size = Vector3(width, height, depth)
-	_mesh_instance.mesh = mesh
+	var box_mesh = BoxMesh.new()
+	box_mesh.size = Vector3(width, height, depth)
+	_mesh.mesh = box_mesh
 
-	var collision_shape = BoxShape3D.new()
-	collision_shape.size = Vector3(width, height, depth)
-	_collision_shape.shape = collision_shape
+	var box_shape = BoxShape3D.new()
+	box_shape.size = Vector3(width, height, depth)
+	_collider.shape = box_shape
 
 	# Offsets both mesh and collision so the cookie sits on top of its origin.
 	var offset = Vector3(0, height * 0.5, 0)
-	_mesh_instance.transform = Transform3D(Basis.IDENTITY, offset)
-	_collision_shape.transform = Transform3D(Basis.IDENTITY, offset)
+	_mesh.transform = Transform3D(Basis.IDENTITY, offset)
+	_collider.transform = Transform3D(Basis.IDENTITY, offset)

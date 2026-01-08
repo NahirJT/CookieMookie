@@ -1,10 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://cl0ecfv7exlq3"]
+[gd_scene load_steps=7 format=3 uid="uid://cl0ecfv7exlq3"]
 
 [ext_resource type="Script" uid="uid://j2y3qc3jwg65" path="res://scripts/main.gd" id="1_o5qli"]
-[ext_resource type="PackedScene" uid="uid://df7xpmog7psyu" path="res://scenes/ui.tscn" id="2_0wfyh"]
 
 [sub_resource type="Gradient" id="Gradient_sgp6g"]
-colors = PackedColorArray(0.9607843, 0.9019608, 0.78431374, 1, 1, 1, 1, 1)
+colors = PackedColorArray(0.68235296, 0.7764706, 0.8117647, 1, 1, 1, 1, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_o5qli"]
 gradient = SubResource("Gradient_sgp6g")
@@ -25,10 +24,6 @@ tonemap_mode = 2
 [node name="Main" type="Node3D"]
 script = ExtResource("1_o5qli")
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
-
-[node name="UI" parent="CanvasLayer" instance=ExtResource("2_0wfyh")]
-
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_0wfyh")
 
@@ -39,6 +34,6 @@ shadow_enabled = true
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(0.74757797, -0.46943712, 0.46984693, 2.9802322e-08, 0.7074152, 0.7067982, -0.66417414, -0.5283867, 0.528848, 2, 3.0692205, 2.161475)
 
-[node name="StackRoot" type="Node3D" parent="."]
+[node name="Stack" type="Node3D" parent="."]
 
-[node name="MovingCookie" type="Node3D" parent="."]
+[node name="ActiveCookie" type="Node3D" parent="."]
