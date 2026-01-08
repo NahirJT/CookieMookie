@@ -58,7 +58,63 @@ func _spawn_base_cookie() -> void:
 	_stack_root.add_child(base_cookie)
 	_last_cookie = base_cookie
 
+	_spawn_moving_cookie()
+
+
+func _spawn_moving_cookie() -> void:
+	if game_over:
+		return
+
+	_current_cookie = _cookie_scene.instantiate() as Node3D
+	_current_cookie.name = "Cookie_%d" % _height_level
+
+	var last_width = _last_cookie.get("width")
+	var last_depth = _last_cookie.get("depth")
+	_current_cookie.set("width", last_width)
+	_current_cookie.set("depth", last_depth)
+	_current_cookie.set("height", cookie_height)
+	_current_cookie.set("movement_axis", _movement_axis)
+	_current_cookie.call_deferred("update_mesh")
+
+	_moving_cookie_root.add_child(_current_cookie)
+
+	var last_position = _last_cookie.global_transform.origin
+	var spawn_position = Vector3(last_position.x, last_position.y + cookie_height, last_position.z)
+	_current_cookie.global_transform = Transform3D(Basis.IDENTITY, spawn_position)
+
+	_height_level += 1
+	_movement_time = 0.0
+
+
+func _move_current_cookie(delta: float) -> void:
+	if not _current_cookie or not _last_cookie:
+		return
+
+	var speed = movement_speed_base + _height_level * speed_increase_per_level
+	var offset = movement_range * sin(_movement_time * speed * 0.6 + _height_level * 0.5)
+
+	var last_position = _last_cookie.global_transform.origin
+	var new_position = _current_cookie.global_transform.origin
+
+	if _current_cookie.get("movement_axis") == "x":
+		new_position.x = last_position.x + offset
+		new_position.z = last_position.z
+	else:
+		new_position.x = last_position.x
+		new_position.z = last_position.z + offset
+
+	new_position.y = last_position.y + cookie_height
+	_current_cookie.global_transform = Transform3D(_current_cookie.global_transform.basis, new_position)
+
 
 func _clear_children(node: Node) -> void:
 	for child in node.get_children():
 		child.queue_free()
+
+
+func _physics_process(delta: float) -> void:
+	if game_over:
+		return
+
+	_movement_time += delta
+	_move_current_cookie(delta)

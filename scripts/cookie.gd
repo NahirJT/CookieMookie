@@ -15,13 +15,13 @@ func _ready():
 
 
 func update_mesh():
-	var cookie_mesh = BoxMesh.new()
-	cookie_mesh.size = Vector3(width, height, depth)
-	_mesh_instance.mesh = cookie_mesh
+	var mesh = BoxMesh.new()
+	mesh.size = Vector3(width, height, depth)
+	_mesh_instance.mesh = mesh
 
-	var cookie_collision_shape = BoxShape3D.new()
-	cookie_collision_shape.size = Vector3(width, height, depth)
-	_collision_shape.shape = cookie_collision_shape
+	var collision_shape = BoxShape3D.new()
+	collision_shape.size = Vector3(width, height, depth)
+	_collision_shape.shape = collision_shape
 
 	# Offsets both mesh and collision so the cookie sits on top of its origin.
 	var offset = Vector3(0, height * 0.5, 0)
