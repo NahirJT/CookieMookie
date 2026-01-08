@@ -1,4 +1,7 @@
-[gd_scene load_steps=6 format=3 uid="uid://sec01x0y4ys0"]
+[gd_scene load_steps=8 format=3 uid="uid://sec01x0y4ys0"]
+
+[ext_resource type="Script" uid="uid://d3lyt2nigt5gi" path="res://scripts/game.gd" id="1_yqjtg"]
+[ext_resource type="PackedScene" uid="uid://bnsg2tg8krogh" path="res://scenes/hud.tscn" id="2_lnu2h"]
 
 [sub_resource type="Gradient" id="Gradient_mwb40"]
 colors = PackedColorArray(0.82092386, 0.0017097968, 0.9608769, 1, 0, 0.76862746, 1, 1)
@@ -20,6 +23,7 @@ sky = SubResource("Sky_feb5d")
 tonemap_mode = 2
 
 [node name="Game" type="Node3D"]
+script = ExtResource("1_yqjtg")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_fc0e3")
@@ -30,3 +34,11 @@ shadow_enabled = true
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.6916139, 0.7222674, 0, -0.7222674, 0.6916139, 3.3518317, 7.6341567, 5.0542636)
+
+[node name="StackRoot" type="Node3D" parent="."]
+
+[node name="MovingBlock" type="Node3D" parent="."]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="CanvasLayer" instance=ExtResource("2_lnu2h")]

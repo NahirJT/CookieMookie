@@ -14,11 +14,24 @@ func _ready():
 	_update_mesh()
 	
 func _update_mesh():
-	var sphere = SphereMesh.new()
-	sphere.size = Vector3(width, height, depth)
-	_Mesh.mesh = sphere
+	var box = BoxMesh.new()
+	box.size = Vector3(width, height, depth)
+	_Mesh.mesh = box
 	
-	var sphere_shape = SphereShape3D.new()
-	sphere_shape.size = Vector3(width, height, depth)
-	_Collision.shape = sphere_shape
+	var box_shape = BoxShape3D.new()
+	box_shape.size = Vector3(width, height, depth)
+	_Collision.shape = box_shape
+	
+	_Mesh.transform = Transform3D(Basis.IDENTITY, Vector3(0, height * 0.5, 0))
+	
+func set_color(hue: float):
+	
+	var mat = StandardMaterial3D.new()
+	mat.albedo_color = Color.from_hsv(hue, 0.6, 1.0)
+	mat.metallic = 0.0
+	_Mesh.set_surface_override_material(0, mat)
+	
+func duplicate_block() -> Node3D:
+	var dup = duplicate() as Node3D
+	return dup
 	
