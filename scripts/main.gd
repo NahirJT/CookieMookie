@@ -261,6 +261,7 @@ func _calculate_slice(current: Node3D, previous: Node3D) -> Dictionary:
 		"falling_center": falling_center
 	}
 
+
 func _make_perfect_result(width: float, depth: float, axis: String) -> Dictionary:
 	return {
 		"is_game_over": false,
