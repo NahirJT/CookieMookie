@@ -1,6 +1,5 @@
 # Godot 4+ specific ignores
 .godot/
-project.godot
 /android/
 
 .editorconfig

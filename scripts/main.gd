@@ -303,3 +303,5 @@ func _spawn_falling_piece(size: Vector3, world_center: Vector3) -> void:
 
 func _on_game_over() -> void:
 	is_game_over = true
+	GameState.score = score
+	get_tree().change_scene_to_file("res://scenes/game_over_menu.tscn")
