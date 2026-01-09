@@ -58,6 +58,7 @@ func _spawn_base_cookie() -> void:
 	base_cookie.set("width", initial_width)
 	base_cookie.set("depth", initial_depth)
 	base_cookie.set("height", cookie_height)
+	base_cookie.set("stack_level", 0)
 	base_cookie.call_deferred("update_mesh")
 	_stack.add_child(base_cookie)
 	_top_cookie = base_cookie
@@ -78,6 +79,7 @@ func _spawn_moving_cookie() -> void:
 	_active_cookie.set("depth", top_depth)
 	_active_cookie.set("height", cookie_height)
 	_active_cookie.set("movement_axis", _movement_axis)
+	_active_cookie.set("stack_level", _stack_count)
 	_active_cookie.call_deferred("update_mesh")
 
 	_active_cookie_holder.add_child(_active_cookie)
@@ -280,6 +282,7 @@ func _spawn_falling_piece(size: Vector3, world_center: Vector3) -> void:
 	falling_piece.set("width", size.x)
 	falling_piece.set("height", size.y)
 	falling_piece.set("depth", size.z)
+	falling_piece.set("stack_level", _active_cookie.get("stack_level"))
 	falling_piece.call_deferred("update_mesh")
 
 	add_child(falling_piece)
@@ -300,4 +303,3 @@ func _spawn_falling_piece(size: Vector3, world_center: Vector3) -> void:
 
 func _on_game_over() -> void:
 	is_game_over = true
-	print("Game Over! Score: %d" % score)
