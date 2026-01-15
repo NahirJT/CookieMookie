@@ -51,3 +51,13 @@ pitch_scale = 1.2
 stream = ExtResource("3_jyhfs")
 autoplay = true
 parameters/looping = true
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="ScoreLabel" type="Label" parent="HUD"]
+custom_minimum_size = Vector2(20, 20)
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 36
+text = "\"Score: 0\""

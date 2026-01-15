@@ -23,6 +23,7 @@ const SIZE_EPSILON: float = 0.001
 @onready var _place_sound: AudioStreamPlayer = $PlaceSound
 @onready var _perfect_sound: AudioStreamPlayer = $PerfectSound
 @onready var _background_music: AudioStreamPlayer = $BackgroundMusic
+@onready var _score_label: Label = $HUD/ScoreLabel
 
 var score: int = 0
 var is_game_over: bool = false
@@ -40,6 +41,8 @@ func _ready() -> void:
 	# Start background music
 	if _background_music:
 		_background_music.play()
+	# Initialize score display
+	_update_score_display()
 
 
 func _start_game() -> void:
@@ -174,6 +177,7 @@ func _place_cookie() -> void:
 
 	_top_cookie = _active_cookie
 	score += 1
+	_update_score_display()
 
 	_move_camera_up()
 	_movement_axis = "z" if _movement_axis == "x" else "x"
@@ -319,3 +323,8 @@ func _on_game_over() -> void:
 	is_game_over = true
 	GameState.score = score
 	get_tree().change_scene_to_file("res://scenes/game_over_menu.tscn")
+
+
+func _update_score_display() -> void:
+	if _score_label:
+		_score_label.text = "Score: %d" % score
