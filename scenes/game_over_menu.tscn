@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://ojh1giju3pr5"]
 
 [ext_resource type="Script" uid="uid://p2havuljra5w" path="res://scripts/game_over_menu.gd" id="1_6ebp1"]
-[ext_resource type="AudioStream" uid="uid://be75go5drs3bj" path="res://assets/audio/sfx/button_click.wav" id="2_cwb3k"]
+[ext_resource type="AudioStream" uid="uid://d3l0cgohr10td" path="res://assets/audio/sfx/button_click.wav" id="2_cwb3k"]
 
 [node name="GameOverMenu" type="Control"]
 layout_mode = 3
@@ -28,7 +28,7 @@ grow_vertical = 2
 
 [node name="GameOverLabel" type="Label" parent="LabelContainer"]
 layout_mode = 2
-text = "Game over."
+text = "Game over!"
 
 [node name="ScoreLabel" type="Label" parent="LabelContainer"]
 layout_mode = 2
@@ -50,7 +50,7 @@ grow_vertical = 2
 
 [node name="RestartButton" type="Button" parent="ButtonContainer"]
 layout_mode = 2
-text = "Restart"
+text = "Restart (Press space)"
 
 [node name="QuitButton" type="Button" parent="ButtonContainer"]
 layout_mode = 2
