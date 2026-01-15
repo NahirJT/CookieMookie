@@ -6,6 +6,22 @@ const CAMERA_MOVE_DURATION: float = 0.15
 const FALLING_DISTANCE: float = 10.0
 const FALLING_DURATION: float = 1.0
 const SIZE_EPSILON: float = 0.001
+const MUSIC_FADE_DURATION: float = 1.0
+
+const TRACKS: Array[String] = [
+	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_1.wav",
+	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_2.wav",
+	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_3.wav",
+	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_4.wav",
+	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_5.wav",
+	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_6.wav",
+	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_7.wav",
+	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_8.wav",
+	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_9.wav",
+	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_10.wav",
+	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_11.wav",
+	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_12.wav",
+]
 
 @export var initial_width: float = 2.0
 @export var initial_depth: float = 2.0
@@ -21,7 +37,6 @@ const SIZE_EPSILON: float = 0.001
 @onready var _stack: Node3D = $Stack
 @onready var _active_cookie_holder: Node3D = $ActiveCookie
 @onready var _place_sound: AudioStreamPlayer = $PlaceSound
-@onready var _perfect_sound: AudioStreamPlayer = $PerfectSound
 @onready var _background_music: AudioStreamPlayer = $BackgroundMusic
 
 var score: int = 0
@@ -36,10 +51,17 @@ var _movement_time: float = 0.0
 
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	_play_random_track()
 	_start_game()
-	# Start background music
-	if _background_music:
-		_background_music.play()
+
+
+func _play_random_track() -> void:
+	if not _background_music:
+		return
+	var track_path = TRACKS.pick_random()
+	_background_music.stream = load(track_path)
+	_background_music.volume_db = 0.0
+	_background_music.play()
 
 
 func _start_game() -> void:
@@ -150,20 +172,15 @@ func _place_cookie() -> void:
 		_on_game_over()
 		return
 
+	if _place_sound:
+		_place_sound.play()
+
 	if result.get("is_perfect", false):
-		# Play perfect sound effect
-		if _perfect_sound:
-			_perfect_sound.play()
-		
 		_active_cookie.set("width", _top_cookie.get("width"))
 		_active_cookie.set("depth", _top_cookie.get("depth"))
 		_active_cookie.call_deferred("update_mesh")
 		_play_perfect_animation(_active_cookie)
 	else:
-		# Play normal placement sound
-		if _place_sound:
-			_place_sound.play()
-		
 		_active_cookie.set("width", result.get("remain_width"))
 		_active_cookie.set("depth", result.get("remain_depth"))
 		_active_cookie.call_deferred("update_mesh")
@@ -318,4 +335,11 @@ func _spawn_falling_piece(size: Vector3, world_center: Vector3) -> void:
 func _on_game_over() -> void:
 	is_game_over = true
 	GameState.score = score
+
+	# Fade out music before changing scene.
+	if _background_music and _background_music.playing:
+		var tween = create_tween()
+		tween.tween_property(_background_music, "volume_db", -40.0, MUSIC_FADE_DURATION)
+		await tween.finished
+
 	get_tree().change_scene_to_file("res://scenes/game_over_menu.tscn")
