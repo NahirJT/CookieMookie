@@ -20,6 +20,9 @@ const SIZE_EPSILON: float = 0.001
 @onready var _camera: Camera3D = $Camera3D
 @onready var _stack: Node3D = $Stack
 @onready var _active_cookie_holder: Node3D = $ActiveCookie
+@onready var _place_sound: AudioStreamPlayer = $PlaceSound
+@onready var _perfect_sound: AudioStreamPlayer = $PerfectSound
+@onready var _background_music: AudioStreamPlayer = $BackgroundMusic
 
 var score: int = 0
 var is_game_over: bool = false
@@ -34,6 +37,9 @@ var _movement_time: float = 0.0
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	_start_game()
+	# Start background music
+	if _background_music:
+		_background_music.play()
 
 
 func _start_game() -> void:
@@ -145,11 +151,19 @@ func _place_cookie() -> void:
 		return
 
 	if result.get("is_perfect", false):
+		# Play perfect sound effect
+		if _perfect_sound:
+			_perfect_sound.play()
+		
 		_active_cookie.set("width", _top_cookie.get("width"))
 		_active_cookie.set("depth", _top_cookie.get("depth"))
 		_active_cookie.call_deferred("update_mesh")
 		_play_perfect_animation(_active_cookie)
 	else:
+		# Play normal placement sound
+		if _place_sound:
+			_place_sound.play()
+		
 		_active_cookie.set("width", result.get("remain_width"))
 		_active_cookie.set("depth", result.get("remain_depth"))
 		_active_cookie.call_deferred("update_mesh")
