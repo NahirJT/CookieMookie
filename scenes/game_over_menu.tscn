@@ -58,3 +58,4 @@ text = "Quit"
 
 [node name="ButtonClick" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("2_cwb3k")
+volume_db = 12.0

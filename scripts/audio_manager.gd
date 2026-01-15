@@ -1,21 +1,18 @@
 extends Node
 
 const MUSIC_FADE_DURATION: float = 1.0
-const MUSIC_VOLUME: float = -2.0
+const MUSIC_VOLUME: float = -8.0
 
 const TRACKS: Array[String] = [
-	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_1.ogg",
-	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_2.ogg",
-	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_3.ogg",
-	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_4.ogg",
-	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_5.ogg",
-	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_6.ogg",
-	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_7.ogg",
-	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_8.ogg",
-	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_9.ogg",
-	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_10.ogg",
-	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_11.ogg",
-	"res://assets/audio/tracks/4bae3f43-ce35-4921-9a90-ec2b814a4f34_12.ogg",
+	"res://assets/audio/tracks/870e1c9e-c290-4abb-a6e8-213e5b9632f9 1.ogg",
+	"res://assets/audio/tracks/870e1c9e-c290-4abb-a6e8-213e5b9632f9 2.ogg",
+	"res://assets/audio/tracks/870e1c9e-c290-4abb-a6e8-213e5b9632f9 3.ogg",
+	"res://assets/audio/tracks/870e1c9e-c290-4abb-a6e8-213e5b9632f9 4.ogg",
+	"res://assets/audio/tracks/870e1c9e-c290-4abb-a6e8-213e5b9632f9 5.ogg",
+	"res://assets/audio/tracks/870e1c9e-c290-4abb-a6e8-213e5b9632f9 6.ogg",
+	"res://assets/audio/tracks/870e1c9e-c290-4abb-a6e8-213e5b9632f9 7.ogg",
+	"res://assets/audio/tracks/870e1c9e-c290-4abb-a6e8-213e5b9632f9 8.ogg",
+	"res://assets/audio/tracks/870e1c9e-c290-4abb-a6e8-213e5b9632f9 9.ogg",
 ]
 
 var _music_player: AudioStreamPlayer = null
