@@ -1,7 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://bfelop77v2h8y"]
+[gd_scene load_steps=5 format=3 uid="uid://bfelop77v2h8y"]
 
-[ext_resource type="Script" uid="uid://cqv30jl6u8p2l" path="res://scripts/main_menu.gd" id="1_l6cm7"]
-[ext_resource type="AudioStream" uid="uid://d3l0cgohr10td" path="res://assets/audio/sfx/button_click.wav" id="2_ekxnf"]
+[ext_resource type="Script" uid="uid://dvunpsbqqgqh8" path="res://scripts/main_menu.gd" id="1_l6cm7"]
+[ext_resource type="AudioStream" uid="uid://dwpm3neaongw7" path="res://assets/audio/sfx/button_click.wav" id="2_ekxnf"]
+[ext_resource type="Texture2D" uid="uid://bj5e3taue1p76" path="res://assets/textures/button_texture/startGame_button.png" id="2_wu84c"]
+[ext_resource type="Texture2D" uid="uid://bln5inn05t14v" path="res://assets/textures/button_texture/exitGame_button.png" id="3_8ln24"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -43,12 +45,20 @@ grow_vertical = 2
 
 [node name="StartButton" type="Button" parent="ButtonContainer"]
 layout_mode = 2
-text = "Start game"
+text = " "
+icon = ExtResource("2_wu84c")
+flat = true
+icon_alignment = 1
+expand_icon = true
 
 [node name="QuitButton" type="Button" parent="ButtonContainer"]
 layout_mode = 2
-text = "Quit
-"
+size_flags_vertical = 4
+text = " "
+icon = ExtResource("3_8ln24")
+flat = true
+icon_alignment = 1
+expand_icon = true
 
 [node name="ButtonClick" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("2_ekxnf")

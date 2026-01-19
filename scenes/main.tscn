@@ -1,7 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://cl0ecfv7exlq3"]
+[gd_scene load_steps=9 format=3 uid="uid://cl0ecfv7exlq3"]
 
-[ext_resource type="Script" uid="uid://j2y3qc3jwg65" path="res://scripts/main.gd" id="1_o5qli"]
+[ext_resource type="Script" uid="uid://cj10wlvs8dqwv" path="res://scripts/main.gd" id="1_o5qli"]
 [ext_resource type="AudioStream" uid="uid://bjp4l4fjsth7b" path="res://assets/audio/sfx/cookie_place.wav" id="2_0wfyh"]
+[ext_resource type="Script" uid="uid://ymxxln3c2b25" path="res://scenes/HUD.gd" id="3_sugp2"]
 
 [sub_resource type="Gradient" id="Gradient_sgp6g"]
 colors = PackedColorArray(0.68235296, 0.7764706, 0.8117647, 1, 1, 1, 1, 1)
@@ -42,3 +43,20 @@ transform = Transform3D(0.74757797, -0.46943712, 0.46984693, 2.9802322e-08, 0.70
 [node name="PlaceSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("2_0wfyh")
 volume_db = 12.0
+
+[node name="HUD" type="CanvasLayer" parent="."]
+script = ExtResource("3_sugp2")
+
+[node name="ScoreLabel" type="Label" parent="HUD"]
+custom_minimum_size = Vector2(20, 20)
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -26.0
+offset_right = 26.0
+offset_bottom = 50.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 36
+text = "\"0\""

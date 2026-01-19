@@ -22,7 +22,6 @@ const SIZE_EPSILON: float = 0.001
 @onready var _active_cookie_holder: Node3D = $ActiveCookie
 @onready var _place_sound: AudioStreamPlayer = $PlaceSound
 
-var score: int = 0
 var is_game_over: bool = false
 
 var _stack_count: int = 0
@@ -43,7 +42,7 @@ func _start_game() -> void:
 	_clear_children(_active_cookie_holder)
 
 	_stack_count = 0
-	score = 0
+	Score.reset_score()
 	_movement_axis = "x"
 	_active_cookie = null
 	_top_cookie = null
@@ -92,7 +91,6 @@ func _spawn_moving_cookie() -> void:
 
 	_stack_count += 1
 
-
 func _move_active_cookie() -> void:
 	if not _active_cookie or not _top_cookie:
 		return
@@ -118,7 +116,6 @@ func _clear_children(node: Node) -> void:
 	for child in node.get_children():
 		child.queue_free()
 
-
 func _physics_process(delta: float) -> void:
 	if is_game_over:
 		return
@@ -137,7 +134,6 @@ func _place_cookie() -> void:
 	var saved_transform = _active_cookie.global_transform
 	if _active_cookie.get_parent() == _active_cookie_holder:
 		_active_cookie_holder.remove_child(_active_cookie)
-
 	_stack.add_child(_active_cookie)
 	_active_cookie.global_transform = saved_transform
 
@@ -164,13 +160,12 @@ func _place_cookie() -> void:
 			_spawn_falling_piece(falling_size, result.get("falling_center"))
 
 	_top_cookie = _active_cookie
-	score += 1
+	Score.add_point()
 
 	_move_camera_up()
 	_movement_axis = "z" if _movement_axis == "x" else "x"
 	_spawn_moving_cookie()
-
-
+	
 func _play_perfect_animation(cookie: Node3D) -> void:
 	var tween = create_tween()
 	tween.tween_property(cookie, "scale", Vector3.ONE * PERFECT_SCALE_FACTOR, PERFECT_SCALE_DURATION) \
@@ -308,6 +303,6 @@ func _spawn_falling_piece(size: Vector3, world_center: Vector3) -> void:
 
 func _on_game_over() -> void:
 	is_game_over = true
-	GameState.score = score
+	GameState.score = Score.get_score()
 	AudioManager.fade_out_music()
 	get_tree().change_scene_to_file("res://scenes/game_over_menu.tscn")
