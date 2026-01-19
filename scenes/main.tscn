@@ -1,8 +1,16 @@
-[gd_scene load_steps=9 format=3 uid="uid://cl0ecfv7exlq3"]
+[gd_scene load_steps=22 format=3 uid="uid://cl0ecfv7exlq3"]
 
 [ext_resource type="Script" uid="uid://cj10wlvs8dqwv" path="res://scripts/main.gd" id="1_o5qli"]
 [ext_resource type="AudioStream" uid="uid://bjp4l4fjsth7b" path="res://assets/audio/sfx/cookie_place.wav" id="2_0wfyh"]
-[ext_resource type="Script" uid="uid://ymxxln3c2b25" path="res://scenes/HUD.gd" id="3_sugp2"]
+[ext_resource type="Script" uid="uid://dto7k2kbvi6m6" path="res://scenes/HUD.gd" id="3_sugp2"]
+[ext_resource type="Texture2D" uid="uid://cokjb3sr7yurc" path="res://assets/models/textures/Kitchen Tile.png" id="4_eb6dy"]
+[ext_resource type="ArrayMesh" uid="uid://b7jlcrmau6p7t" path="res://assets/models/floor.obj" id="5_trceg"]
+[ext_resource type="Texture2D" uid="uid://dikihn6chyh4f" path="res://assets/models/textures/c01880da-8498-4684-a887-96041e060f6b.jpg" id="7_jkv2x"]
+[ext_resource type="ArrayMesh" uid="uid://hkv0us082pai" path="res://assets/models/table.obj" id="8_jbj1t"]
+[ext_resource type="Texture2D" uid="uid://ctu6eafcf1jm" path="res://assets/models/textures/Red-Texture1-1700176744.jpg" id="9_choun"]
+[ext_resource type="ArrayMesh" uid="uid://dcuety6ynolp" path="res://assets/models/tablecloth.obj" id="11_0ld40"]
+[ext_resource type="ArrayMesh" uid="uid://g5jd2724ck5b" path="res://assets/models/plate.obj" id="11_ya4ey"]
+[ext_resource type="Shader" uid="uid://cpa8w7tqpy2hi" path="res://shaders/main.gdshader" id="12_eb6dy"]
 
 [sub_resource type="Gradient" id="Gradient_sgp6g"]
 colors = PackedColorArray(0.68235296, 0.7764706, 0.8117647, 1, 1, 1, 1, 1)
@@ -23,6 +31,41 @@ background_mode = 2
 sky = SubResource("Sky_o5qli")
 tonemap_mode = 2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yc10j"]
+albedo_texture = ExtResource("4_eb6dy")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jscy8"]
+render_priority = 0
+shader = ExtResource("12_eb6dy")
+shader_parameter/base_color = Color(0.361, 0.251, 0.2, 1)
+shader_parameter/light_color = Color(0.627, 0.502, 0.439, 1)
+shader_parameter/chip_color = Color(0.18, 0.102, 0.063, 1)
+shader_parameter/lightness = 0.0
+shader_parameter/chip_density = 2.5
+shader_parameter/chip_world_size = 0.18
+shader_parameter/chip_probability = 0.35
+shader_parameter/chip_offset = Vector2(0, 0)
+shader_parameter/cookie_scale = Vector3(1, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pm3ni"]
+albedo_texture = ExtResource("7_jkv2x")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_y6deb"]
+render_priority = 0
+shader = ExtResource("12_eb6dy")
+shader_parameter/base_color = Color(0.361, 0.251, 0.2, 1)
+shader_parameter/light_color = Color(0.627, 0.502, 0.439, 1)
+shader_parameter/chip_color = Color(0.18, 0.102, 0.063, 1)
+shader_parameter/lightness = 0.0
+shader_parameter/chip_density = 2.5
+shader_parameter/chip_world_size = 0.18
+shader_parameter/chip_probability = 0.35
+shader_parameter/chip_offset = Vector2(0, 0)
+shader_parameter/cookie_scale = Vector3(1, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ya4ey"]
+albedo_texture = ExtResource("9_choun")
+
 [node name="Main" type="Node3D"]
 script = ExtResource("1_o5qli")
 
@@ -30,11 +73,11 @@ script = ExtResource("1_o5qli")
 environment = SubResource("Environment_0wfyh")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 1.8434682, 6.5534763, -1.0451403)
 shadow_enabled = true
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(0.74757797, -0.46943712, 0.46984693, 2.9802322e-08, 0.7074152, 0.7067982, -0.66417414, -0.5283867, 0.528848, 2, 3.0692205, 2.161475)
+transform = Transform3D(0.74977076, -0.282059, 0.59857064, 0.06083381, 0.93014985, 0.36210546, -0.6588956, -0.2350828, 0.71455795, 2.3511717, 2.4915736, 3.1389751)
 
 [node name="Stack" type="Node3D" parent="."]
 
@@ -60,3 +103,26 @@ theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 36
 text = "\"0\""
+
+[node name="Floor" type="MeshInstance3D" parent="."]
+transform = Transform3D(17.064949, 0, 0, 0, 1, 0, 0, 0, 16.918314, -14.431057, -13.539325, -15.094329)
+material_override = SubResource("StandardMaterial3D_yc10j")
+mesh = ExtResource("5_trceg")
+surface_material_override/0 = SubResource("ShaderMaterial_jscy8")
+
+[node name="Table" type="MeshInstance3D" parent="."]
+transform = Transform3D(2.4615927, 0, 0, 0, 3.0185156, 0, 0, 0, 2.3949003, -0.41447866, -1.2975619, 0.41228473)
+material_override = SubResource("StandardMaterial3D_pm3ni")
+mesh = ExtResource("8_jbj1t")
+surface_material_override/0 = SubResource("ShaderMaterial_y6deb")
+
+[node name="Tablecloth" type="MeshInstance3D" parent="."]
+transform = Transform3D(2.5044446, 0, 0, 0, 0.74300116, 0, 0, 0, 2.4717329, -0.36583173, -0.88830614, 0.34972775)
+material_override = SubResource("StandardMaterial3D_ya4ey")
+mesh = ExtResource("11_0ld40")
+
+[node name="Plate" type="MeshInstance3D" parent="."]
+transform = Transform3D(3.1965752, 0, 0, 0, 1, 0, 0, 0, 3.1965752, 0.020560384, -0.8037859, -0.042668283)
+gi_mode = 2
+gi_lightmap_texel_scale = 0.7905
+mesh = ExtResource("11_ya4ey")
